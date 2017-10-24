@@ -25,13 +25,15 @@ def mainEntry():
     # Main program entry point
     parser = argparse.ArgumentParser(description='Infusionsoft test data uploader and downloader')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-u','--upload', help='Upload, passing CSV file to upload', nargs=1, type=argparse.FileType('rU' ))
-    group.add_argument('-d','--download', help='Download, passing file to create', nargs=1, type=argparse.FileType('wb' ))
-    group.add_argument('-x','--delete', help='Delete records, passed a single item space-separated list of ids', nargs=1)
+    group.add_argument('-u','--upload', help='Upload, passing CSV file to upload, or - for stdin', nargs=1,
+                       type=argparse.FileType('rU' ))
+    group.add_argument('-d','--download', help='Download some records, passing file to create, or - for stdout', nargs=1,
+                       type=argparse.FileType('wb' ))
+    group.add_argument('-x','--delete', help='Delete records, passed a space-separated list of ids as a single parameter', nargs=1)
     parser.add_argument('-c', '--credentials', default='credentials',
-                        help='Infusionsoft credentials file, containing one line with username and API key separated by a comma')
-    parser.add_argument('table', help='Infusionsoft table to download data from or upload it to')
-    parser.add_argument('-m', '--maxrecords', type=int, default=25, help='Maximum number of records to download')
+                        help='Infusionsoft credentials file, containing one line with username and API key separated by a comma. Default <credentials>')
+    parser.add_argument('table', help='Infusionsoft table to use')
+    parser.add_argument('-m', '--maxrecords', type=int, default=25, help='Maximum number of records to download. Default 25.')
     args = parser.parse_args()
 
     global infusionsoftCredentialFile
@@ -114,7 +116,7 @@ def deleteRecords( table, recordIds ):
         getInfusionsoft().DataService('delete', table, id)
 
 
-# Lifted from Infusionsoft Python API library, and amended to give more helpful error handling:
+# Lifted from Infusionsoft Python API library, and amended to change error handling:
 
 class Infusionsoft(object):
     base_uri = 'https://%s.infusionsoft.com/api/xmlrpc'
